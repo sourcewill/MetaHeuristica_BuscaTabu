@@ -15,7 +15,36 @@ cities = [
 
 #---------------------------------------------------------------------------------------------------
 
-# Algoritmo guloso usando o vizinho mais próximo
+# Retorna o indice do elemento anterior em um vetor circular
+# Tendo como base o indice atual
+def anterior_vet_circular(indice_atual, tam_vet):
+    indice_anterior = indice_atual - 1
+    if indice_anterior < 0:
+        indice_anterior = tam_vet - 1
+    return indice_anterior
+
+#---------------------------------------------------------------------------------------------------
+
+# Retorna o indice do próximo elemento em um vetor circular
+# Tendo como base o indice atual
+def proximo_vet_circular(indice_atual, tam_vet):
+    indice_proximo = indice_atual + 1
+    if indice_proximo == tam_vet:
+        indice_proximo = 0
+    return indice_proximo
+
+#---------------------------------------------------------------------------------------------------
+
+# Retorna o custo de um dado caminho no grafo, tendo como base sua matriz de adj
+def calcula_custo_caminho(caminho, matriz_adj):
+    distancia_total = 0
+    for i in range(len(caminho)-1):
+        distancia_total += matriz_adj[caminho[i]][caminho[i+1]]
+    return distancia_total
+
+#---------------------------------------------------------------------------------------------------
+
+# Heurística: Vizinho mais próximo
 def greedy_closest_neighbor(cities, initial=0):
     # Inicializa a rota com a cidade inicial e a distancia total com zero
     current = initial
@@ -61,35 +90,7 @@ def greedy_closest_neighbor(cities, initial=0):
 
 #---------------------------------------------------------------------------------------------------
 
-# Retorna o indice do elemento anterior em um vetor circular
-# Tendo como base o indice atual
-def anterior_vet_circular(indice_atual, tam_vet):
-    indice_anterior = indice_atual - 1
-    if indice_anterior < 0:
-        indice_anterior = tam_vet - 1
-    return indice_anterior
-
-#---------------------------------------------------------------------------------------------------
-
-# Retorna o indice do próximo elemento em um vetor circular
-# Tendo como base o indice atual
-def proximo_vet_circular(indice_atual, tam_vet):
-    indice_proximo = indice_atual + 1
-    if indice_proximo == tam_vet:
-        indice_proximo = 0
-    return indice_proximo
-
-#---------------------------------------------------------------------------------------------------
-
-def calcula_custo_caminho(caminho, matriz_adj):
-    distancia_total = 0
-    for i in range(len(caminho)-1):
-        distancia_total += matriz_adj[caminho[i]][caminho[i+1]]
-    return distancia_total
-
-#---------------------------------------------------------------------------------------------------
-
-##### Inserção mais próxima #####
+# Heurística: Inserção mais próxima
 def greedy_closest_insertion(cities):
 
     ciclo = [0, 1, 2] # Ciclo inicial
@@ -142,7 +143,7 @@ def greedy_closest_insertion(cities):
 
 #---------------------------------------------------------------------------------------------------
 
-##### Inserção mais distante #####
+# Heurística: Inserção mais distante
 def greedy_further_insertion(cities):
 
     ciclo = [0, 1, 2] # Ciclo inicial
@@ -195,7 +196,7 @@ def greedy_further_insertion(cities):
 
 #---------------------------------------------------------------------------------------------------
 
-##### Inserção mais barata #####
+# Heurística: Inserção mais barata
 def greedy_cheapest_insertion(cities):
 
     ciclo = [0, 1, 2] # Ciclo inicial
@@ -252,6 +253,7 @@ def greedy_cheapest_insertion(cities):
 
 #---------------------------------------------------------------------------------------------------
 
+# Gera a vizinhança de um atual estado, realizando trocas de elementos consecutivos
 def vizinhanca_troca_consecutivos(solucao_atual):
 
     tam_vet = len(solucao_atual)
@@ -264,7 +266,7 @@ def vizinhanca_troca_consecutivos(solucao_atual):
         vetor_aux[i+1] = vetor_aux[i]
         vetor_aux[i] = temp
 
-        #Trata vetor crcular
+        #Trata vetor circular
         if i == 0:
             vetor_aux[tam_vet-1] = vetor_aux[0]
 
@@ -277,6 +279,7 @@ def vizinhanca_troca_consecutivos(solucao_atual):
 
 #---------------------------------------------------------------------------------------------------
 
+# Gera a vizinhança de um atual estado, realizando trocas de dois elementos quaisquer
 def vizinhanca_troca_dois_quaisquer(solucao_atual):
 
     tam_vet = len(solucao_atual)
@@ -290,10 +293,9 @@ def vizinhanca_troca_dois_quaisquer(solucao_atual):
                 vetor_aux[i] = vetor_aux[j]
                 vetor_aux[j] = temp
 
-                #Trata vetor crcular
+                #Trata vetor circular
                 if i == 0 or j == 0:
                     vetor_aux[tam_vet-1] = vetor_aux[0]
-
                 
                 if vetor_aux not in vizinhanca:
                     vizinhanca.append(vetor_aux)
@@ -302,6 +304,7 @@ def vizinhanca_troca_dois_quaisquer(solucao_atual):
 
 #---------------------------------------------------------------------------------------------------
 
+# Gera a vizinhança de um atual estado, realizando trocas de três elementos quaisquer
 def vizinhanca_troca_tres_quaisquer(solucao_atual):
 
     tam_vet = len(solucao_atual)
@@ -317,8 +320,8 @@ def vizinhanca_troca_tres_quaisquer(solucao_atual):
                     vetor_aux[j] = vetor_aux[k]
                     vetor_aux[k] = temp
 
-                    #Trata vetor crcular
-                    if i == 0 or j == 0 or k ==0:
+                    #Trata vetor circular
+                    if i == 0 or j == 0 or k == 0:
                         vetor_aux[tam_vet-1] = vetor_aux[0]
 
                     if vetor_aux not in vizinhanca:
@@ -328,6 +331,7 @@ def vizinhanca_troca_tres_quaisquer(solucao_atual):
 
 #---------------------------------------------------------------------------------------------------
 
+# Meta-Heurística: Busca Tabu
 def busca_tabu(solucao_inicial, matriz_adj, BTMax, tam_lista_tabu):
 
     solucao = solucao_inicial
@@ -349,6 +353,7 @@ def busca_tabu(solucao_inicial, matriz_adj, BTMax, tam_lista_tabu):
             if i not in lista_tabu:
                 custo = calcula_custo_caminho(i, matriz_adj)
                 if custo < melhor_custo:
+                    melhor_custo = custo
                     solucao_aux = i
 
         #print("Melhor solucao vizinha de S:", solucao_aux)
@@ -373,21 +378,20 @@ def busca_tabu(solucao_inicial, matriz_adj, BTMax, tam_lista_tabu):
 
 #---------------------------------------------------------------------------------------------------
 
+# Executando Heurísticas
 print("\nVizinho mais próximo:\n", greedy_closest_neighbor(cities))
 print("Inserção mais próxima:\n", greedy_closest_insertion(cities))
 print("Inserção mais distante:\n", greedy_further_insertion(cities))
 print("Inserção mais barata:\n", greedy_cheapest_insertion(cities))
 
-#print("\n\nVizinhança (Troca de consecutivos)\n", vizinhanca_troca_consecutivos([4, 7, 3, 1, 4]))
-#print("\n\nVizinhança (Troca de dois quaisquer)\n", vizinhanca_troca_dois_quaisquer([4, 7, 3, 1, 4]))
-#print("\n\nVizinhança (Troca de tres quaisquer)\n", vizinhanca_troca_tres_quaisquer([4, 7, 3, 1, 4]))
+# Executando métodos de geração de vizinhança
+print("\n\nVizinhança (Troca de consecutivos)\n", vizinhanca_troca_consecutivos([1, 2, 3, 4, 1]))
+print("\n\nVizinhança (Troca de dois quaisquer)\n", vizinhanca_troca_dois_quaisquer([1, 2, 3, 4, 1]))
+print("\n\nVizinhança (Troca de tres quaisquer)\n", vizinhanca_troca_tres_quaisquer([1, 2, 3, 4, 1]))
 
-#299 [0, 8, 7, 2, 10, 1, 4, 3, 5, 9, 6, 0]
-#255 [0, 8, 10, 1, 6, 2, 7, 3, 5, 9, 4, 0]
-#278 [0, 8, 9, 5, 4, 3, 7, 10, 6, 1, 2, 0]
-#256 [0, 8, 10, 1, 6, 2, 7, 9, 5, 3, 4, 0]
+# Gerando solução inicial com uma Heurística para usar na Busca Tabu
+solucao_inicial = greedy_cheapest_insertion(cities)[1]
 
-#253 [0, 8, 10, 1, 6, 2, 7, 3, 5, 9, 4, 0]
-
-print("\nBusca Tabu:\n", busca_tabu([0, 8, 10, 1, 6, 2, 7, 3, 5, 9, 4, 0], cities, 1000, 100))
+# Executando Busca Tabu (Meta-Heurística)
+print("\nBusca Tabu:\n", busca_tabu(solucao_inicial, cities, 10, 5))
 
