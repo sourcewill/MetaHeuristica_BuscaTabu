@@ -31,15 +31,14 @@ def gera_grafo(num_cidades, dist_min, dist_max):
 				matriz_adj[j][i] = aleatorio
 
 	# Exibe grafo gerado
-	print("\n")
+	print()
 	print(matriz_adj)
 
 	# Salva o grafo gerado em um arquivo de texto
 	arq = open("grafo_{}_cidades.txt".format(num_cidades), "w")
 	arq.write(str(matriz_adj))
+	print("\n---> Arquivo {} criado no diretório atual.".format(arq.name))
 	arq.close()
-
-	print("\n---> Arquivo 'grafo_{}_cidades.txt' criado no diretório atual.".format(num_cidades))
 
 	return matriz_adj
 
