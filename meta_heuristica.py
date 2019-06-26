@@ -332,49 +332,49 @@ def vizinhanca_troca_tres_quaisquer(solucao_atual):
 #---------------------------------------------------------------------------------------------------
 
 # Meta-Heurística: Busca Tabu
+
+# solucao_inicial : Solução inicial válida (gerada por uma heurística)
+# matriz_adj : Matriz de adj de um grafo completo
+# BTMax : Critério de parada por estagnação (número de interações sem melhorara na solução)
+# tam_lista_tabu : Tamanho máximo que a lista tabu pode atingir
+
 def busca_tabu(solucao_inicial, matriz_adj, BTMax, tam_lista_tabu):
 
-    solucao = solucao_inicial
-    melhor_solucao = solucao
+    solucao_atual = solucao_inicial
+    melhor_solucao = solucao_atual
     custo_melhor_solucao = calcula_custo_caminho(melhor_solucao, matriz_adj)
     interacao = 0
     melhor_interacao = 0
-
     lista_tabu = []
 
     while((interacao - melhor_interacao) <= BTMax):
         
         interacao += 1
-        melhor_custo = float("inf")
+        melhor_custo_atual = float("inf")
 
         #Enocntra o melhor vizinho da solução e que não está na lista tabu
-        vizinhanca = vizinhanca_troca_dois_quaisquer(solucao)
-        for i in vizinhanca:
-            if i not in lista_tabu:
-                custo = calcula_custo_caminho(i, matriz_adj)
-                if custo < melhor_custo:
-                    melhor_custo = custo
-                    solucao_aux = i
+        vizinhanca = vizinhanca_troca_dois_quaisquer(solucao_atual)
+        for vizinho in vizinhanca:
+            if vizinho not in lista_tabu:
+                custo_vizinho = calcula_custo_caminho(vizinho, matriz_adj)
+                if custo_vizinho < melhor_custo_atual:
+                    melhor_custo_atual = custo_vizinho
+                    melhor_vizinho = vizinho
 
-        #print("Melhor solucao vizinha de S:", solucao_aux)
-
+        # Controle do tamanho da lista tabu
         if len(lista_tabu) == tam_lista_tabu:
             lista_tabu.pop(0)
-        lista_tabu.append(solucao)
+        lista_tabu.append(solucao_atual)
 
-        solucao = solucao_aux
+        solucao_atual = melhor_vizinho
 
-        if calcula_custo_caminho(solucao, matriz_adj) < custo_melhor_solucao:
-            melhor_solucao = solucao
-            custo_melhor_solucao = calcula_custo_caminho(melhor_solucao, matriz_adj)
+        if melhor_custo_atual < custo_melhor_solucao:
+            melhor_solucao = solucao_atual
+            custo_melhor_solucao = melhor_custo_atual
             melhor_interacao = interacao
+            #print("Melhor custo ate o momento:", custo_melhor_solucao)        
 
-        #print("Melhor custo ate o momento:", custo_melhor_solucao)
-
-    # Calcula a distancia total
-    distancia_total = calcula_custo_caminho(melhor_solucao, matriz_adj)
-
-    return (distancia_total, melhor_solucao)
+    return (custo_melhor_solucao, melhor_solucao)
 
 #---------------------------------------------------------------------------------------------------
 
